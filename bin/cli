@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+const tuya = require('../lib/tuya')
+const main = async () => {
+  const [,, deviceId, command] = process.argv
+  if (!deviceId || !command) throw new Error('Usage: node index.js deviceId command')
+  switch (command) {
+    case 'info':
+      return console.log(await tuya.getDeviceInfo(deviceId))
+    case 'status':
+      return console.log(await tuya.getDeviceStatus(deviceId))
+    case 'switch_on':
+      return await tuya.switchOn(deviceId)
+    case 'switch_off':
+      return await tuya.switchOff(deviceId)
+    default:
+      throw new Error(`Unknown command ${command}`)
+  }
+}
+main()
