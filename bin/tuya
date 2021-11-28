@@ -8,6 +8,8 @@ const main = async () => {
       return console.log(await tuya.getDeviceInfo(deviceId))
     case 'status':
       return console.log(await tuya.getDeviceStatus(deviceId))
+    case 'power':
+      return console.log(JSON.stringify(await tuya.getDevicePowerUsage(deviceId, idx)))
     case 'switch_on':
       return await tuya.switchOn(deviceId, idx)
     case 'switch_off':
