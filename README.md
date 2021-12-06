@@ -14,6 +14,10 @@ should register all the devices you already registered in the app.
 
 ## Usage
 
+Just clone and run `npm install` in the tool's folder.
+
+`git clone git@github.com:gdelory/tuya-oauth-client.git && cd tuya-oauth-client && npm install`
+
 All commands require three things to be defined either via command line options, or environment variables:
 
  * `API Base URL`: for instance https://openapi.tuyaeu.com or https://openapi.tuyacn.com, can be either defined using the `TUYA_HOST` environment variable, or the command line option `--baseUrl`
