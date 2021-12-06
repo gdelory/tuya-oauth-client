@@ -1,11 +1,12 @@
 {
   "name": "tuya",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "bin/cli",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.24.0",
-    "qs": "^6.10.1"
+    "qs": "^6.10.1",
+    "yargs": "^17.3.0"
   },
   "devDependencies": {
     "eslint": "^7.20.0",

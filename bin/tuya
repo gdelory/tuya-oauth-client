@@ -1,21 +1,91 @@
 #!/usr/bin/env node
-const tuya = require('../lib/tuya')
-const main = async () => {
-  const [,, deviceId, command, idx] = process.argv
-  if (!deviceId || !command) throw new Error('Usage: node index.js deviceId command')
-  switch (command) {
-    case 'info':
-      return console.log(await tuya.getDeviceInfo(deviceId))
-    case 'status':
-      return console.log(await tuya.getDeviceStatus(deviceId))
+const Tuya = require('../lib/tuya')
+const yargs = require('yargs/yargs')
+const { hideBin } = require('yargs/helpers')
+const { inspect } = require('util')
+
+yargs(hideBin(process.argv)).option('deviceId', {
+  alias: 'd',
+  desc: 'The device ID to control',
+  demandOption: true,
+  nargs: 1
+}).command('info', 'Request device informations', () => {}, async argv => {
+  const tuya = new Tuya(argv)
+  console.log(inspect(await tuya.getDeviceInfo(argv.deviceId), null, null))
+}).command('specs', 'Request device specifications', () => {}, async argv => {
+  const tuya = new Tuya(argv)
+  console.log(inspect(await tuya.getDeviceSpecs(argv.deviceId), null, null))
+}).command('status', 'Request device current status', () => {}, async argv => {
+  const tuya = new Tuya(argv)
+  console.log(inspect(await tuya.getDeviceStatus(argv.deviceId), null, null))
+}).command('switch <command>', 'All switches commands', yargs => {
+  return yargs
+    .positional('command', {
+      choices: ['on', 'off', 'power'],
+      describe: 'command to execute on the switch',
+      demandOption: true
+    }).option('index', {
+      alias: 'i',
+      desc: 'In case this is a multiple switch device, specifies the index of the switch to control. Index starts at 1, not 0',
+      nargs: 1
+    })
+}, async argv => {
+  const tuya = new Tuya(argv)
+  switch (argv.command) {
     case 'power':
-      return console.log(JSON.stringify(await tuya.getDevicePowerUsage(deviceId, idx)))
-    case 'switch_on':
-      return await tuya.switchOn(deviceId, idx)
-    case 'switch_off':
-      return await tuya.switchOff(deviceId, idx)
-    default:
-      throw new Error(`Unknown command ${command}`)
+      return console.log(inspect(await tuya.getDevicePowerUsage(argv.deviceId, argv.index), null, null))
+    case 'on':
+      return console.log(await tuya.switchOn(argv.deviceId, argv.index))
+    case 'off':
+      return console.log(await tuya.switchOff(argv.deviceId, argv.index))
   }
-}
-main()
+}).command('curtain <command>', 'All curtains commands', yargs => {
+  return yargs.positional('command', {
+    choices: ['open', 'close', 'stop'],
+    describe: 'command to execute on the curtain',
+    demandOption: true
+  }).option('percent', {
+    desc: 'Percentage to open',
+    nargs: 1
+  }).option('upTime', {
+    desc: 'The time it takes for your curtain to fully open, in seconds. This can also be set using the CURTAIN_UP_TIME environment variable.',
+    nargs: 1
+  }).option('downTime', {
+    desc: 'The time it takes for your curtain to fully close, in seconds. This can also be set using the CURTAIN_DOWN_TIME environment variable.',
+    nargs: 1
+  })
+}, async argv => {
+  const { upTime = process.env.CURTAIN_UP_TIME, downTime = process.env.CURTAIN_DOWN_TIME, percent } = argv
+  const tuya = new Tuya(argv)
+  switch (argv.command) {
+    case 'open':
+      if (percent && !upTime) {
+        throw new Error('To use percent you need to set the CURTAIN_UP_TIME environment variable or --upTime option, in seconds.')
+      }
+      console.log(await tuya.sendCommand(argv.deviceId, 'control', 'open'))
+      if (percent) {
+        setTimeout(async () => console.log(await tuya.sendCommand(argv.deviceId, 'control', 'stop')), upTime * argv.percent / 100 * 1000)
+      }
+      break
+    case 'close':
+      if (percent && !downTime) {
+        throw new Error('To use percent you need to set the CURTAIN_DOWN_TIME environment variable or --downTime option, in seconds.')
+      }
+      console.log(await tuya.sendCommand(argv.deviceId, 'control', 'close'))
+      if (percent) {
+        setTimeout(async () => console.log(await tuya.sendCommand(argv.deviceId, 'control', 'stop')), upTime * argv.percent / 100 * 1000)
+      }
+      break
+    case 'stop':
+      return console.log(await tuya.sendCommand(argv.deviceId, 'control', 'stop'))
+  }
+}).option('clientId', {
+  desc: 'The OAuth client ID of your Tuya cloud project. This can also be provided by the TUYA_CLIENT_ID environment variable',
+  nargs: 1
+}).option('clientSecret', {
+  desc: 'The OAuth client Secret of your Tuya cloud project. This can also be provided by the TUYA_CLIENT_SECRET environment variable',
+  nargs: 1
+}).option('baseUrl', {
+  desc: 'The base URL. This can also be provided by the TUYA_HOST environment variable',
+  nargs: 1
+}).parse()
