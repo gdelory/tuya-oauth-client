@@ -41,6 +41,19 @@ All commands require the requied option `-d | --deviceId`, a call shoud look lik
 
 You will find the deviceId is the page Cloud > Development > <project_name> > Devices tab
 
+You can also use the run-sample.sh script to set the environment variable once for all and call it:
+
+```
+cp run-sample.sh run.sh
+chmod u+x run.sh
+# Edit run.sh to add your OAuth client ID and secret
+./run.sh -d <deviceId> <command> [options]
+```
+
+For debugging purpose you can also use the verbose (`-v|--verbose`) mode which show the parameters passed:
+
+`bin/tuya -v -d <deviceId> <command> [options]`
+
 ## Switch command
 
 Usage: `bin/tuya -d <deviceId> switch <command> [-i <index>]`

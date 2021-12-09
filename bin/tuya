@@ -10,12 +10,15 @@ yargs(hideBin(process.argv)).option('deviceId', {
   demandOption: true,
   nargs: 1
 }).command('info', 'Request device informations', () => {}, async argv => {
+  if (argv.verbose) console.log('Parameters:', argv)
   const tuya = new Tuya(argv)
   console.log(inspect(await tuya.getDeviceInfo(argv.deviceId), null, null))
 }).command('specs', 'Request device specifications', () => {}, async argv => {
+  if (argv.verbose) console.log('Parameters:', argv)
   const tuya = new Tuya(argv)
   console.log(inspect(await tuya.getDeviceSpecs(argv.deviceId), null, null))
 }).command('status', 'Request device current status', () => {}, async argv => {
+  if (argv.verbose) console.log('Parameters:', argv)
   const tuya = new Tuya(argv)
   console.log(inspect(await tuya.getDeviceStatus(argv.deviceId), null, null))
 }).command('switch <command>', 'All switches commands', yargs => {
@@ -30,6 +33,7 @@ yargs(hideBin(process.argv)).option('deviceId', {
       nargs: 1
     })
 }, async argv => {
+  if (argv.verbose) console.log('Parameters:', argv)
   const tuya = new Tuya(argv)
   switch (argv.command) {
     case 'power':
@@ -45,6 +49,7 @@ yargs(hideBin(process.argv)).option('deviceId', {
     describe: 'command to execute on the curtain',
     demandOption: true
   }).option('percent', {
+    alias: 'p',
     desc: 'Percentage to open',
     nargs: 1
   }).option('upTime', {
@@ -56,6 +61,11 @@ yargs(hideBin(process.argv)).option('deviceId', {
   })
 }, async argv => {
   const { upTime = process.env.CURTAIN_UP_TIME, downTime = process.env.CURTAIN_DOWN_TIME, percent } = argv
+  if (argv.verbose) {
+    console.log('Parameters:', argv)
+    console.log('upTime:', upTime)
+    console.log('downTime:', downTime)
+  }
   const tuya = new Tuya(argv)
   switch (argv.command) {
     case 'open':
@@ -88,4 +98,10 @@ yargs(hideBin(process.argv)).option('deviceId', {
 }).option('baseUrl', {
   desc: 'The base URL. This can also be provided by the TUYA_HOST environment variable',
   nargs: 1
+}).option('verbose', {
+  desc: 'Verbose mode',
+  alias: 'v',
+  boolean: true,
+  demandOption: false,
+  nargs: 0
 }).parse()
