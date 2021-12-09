@@ -95,7 +95,7 @@ Options:
  
 ## Curtain command
 
-Usage: `bin/tuya -d <deviceId> curtain <command> [--upTime=XX] [--downTime=XX] [--progress=]`
+Usage: `bin/tuya -d <deviceId> curtain <command> [--upTime=XX] [--downTime=XX] [--percent=XX]`
 
  * `open`: Open the curtain. Example: `bin/tuya -d <deviceId> curtain open`
  * `close`: Close the curtain. Example: `bin/tuya -d <deviceId> curtain close`
@@ -108,7 +108,7 @@ You can control how much percent to open (from the current position, not as abso
 
  For instance to open only at 50% your curtain, use:
 
- `bin/tuya -d <deviceId> curtain open --upTime=22 --progress=50`
+ `bin/tuya -d <deviceId> curtain open --upTime=22 --percent=50`
 
  Assuming this curtain takes 22 seconds to fully open.
 
