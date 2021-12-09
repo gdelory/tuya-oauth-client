@@ -83,7 +83,7 @@ yargs(hideBin(process.argv)).option('deviceId', {
       }
       console.log(await tuya.sendCommand(argv.deviceId, 'control', 'close'))
       if (percent) {
-        setTimeout(async () => console.log(await tuya.sendCommand(argv.deviceId, 'control', 'stop')), upTime * argv.percent / 100 * 1000)
+        setTimeout(async () => console.log(await tuya.sendCommand(argv.deviceId, 'control', 'stop')), downTime * argv.percent / 100 * 1000)
       }
       break
     case 'stop':
